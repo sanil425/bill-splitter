@@ -16,9 +16,15 @@ describe("ReceiptParseResponseSchema", () => {
     expect(result.data?.unreadableLines).toEqual([]);
   });
 
+  it("accepts a null lineTotal (unreadable price) and missing unitPrice/quantity", () => {
+    const items = [{ name: "Dessert", rawText: "TIRAMISU ##.##", lineTotal: null, confidence: 0.3 }];
+    expect(parseReceipt({ ...receiptResponse, items }).success).toBe(true);
+  });
+
   it("rejects a price given as a string", () => {
-    const items = [{ ...receiptResponse.items[0], unitPrice: "$12" }];
-    expect(parseReceipt({ ...receiptResponse, items }).success).toBe(false);
+    const item = receiptResponse.items[0];
+    expect(parseReceipt({ ...receiptResponse, items: [{ ...item, lineTotal: "$12" }] }).success).toBe(false);
+    expect(parseReceipt({ ...receiptResponse, items: [{ ...item, unitPrice: "$12" }] }).success).toBe(false);
     expect(parseReceipt({ ...receiptResponse, total: "$29.40" }).success).toBe(false);
   });
 
@@ -28,8 +34,8 @@ describe("ReceiptParseResponseSchema", () => {
   });
 
   it("rejects items missing required fields", () => {
-    const { unitPrice: _, ...noPrice } = receiptResponse.items[0];
-    expect(parseReceipt({ ...receiptResponse, items: [noPrice] }).success).toBe(false);
+    const { lineTotal: _, ...noLineTotal } = receiptResponse.items[0];
+    expect(parseReceipt({ ...receiptResponse, items: [noLineTotal] }).success).toBe(false);
     expect(parseReceipt({ merchant: "Luigi's" }).success).toBe(false);
   });
 

@@ -17,9 +17,12 @@ const NameSchema = z.string().trim().min(1);
 export const ReceiptParseItemSchema = z.object({
   name: NameSchema,
   rawText: z.string(),
-  quantity: z.number().positive(),
-  /** Price of one unit, in dollars. Negative for discounts. */
-  unitPrice: DollarsSchema,
+  /** Total for the line, in dollars. Negative for discounts; null if unreadable. */
+  lineTotal: DollarsSchema.nullable(),
+  /** Display only: unit price in dollars, if printed. */
+  unitPrice: DollarsSchema.nullish(),
+  /** Display only. */
+  quantity: z.number().positive().nullish(),
   confidence: ConfidenceSchema,
 });
 export type ReceiptParseItem = z.infer<typeof ReceiptParseItemSchema>;
@@ -32,6 +35,7 @@ export const ReceiptParseResponseSchema = z.object({
   tip: NonNegativeDollarsSchema.nullish(),
   serviceCharge: NonNegativeDollarsSchema.nullish(),
   total: DollarsSchema.nullish(),
+  /** Text that can't be tied to any item. */
   unreadableLines: z.array(z.string()).default([]),
 });
 export type ReceiptParseResponse = z.infer<typeof ReceiptParseResponseSchema>;

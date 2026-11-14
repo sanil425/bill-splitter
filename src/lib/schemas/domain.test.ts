@@ -25,6 +25,7 @@ const item: Item = {
   receiptId: "r1",
   name: "Margherita pizza",
   rawText: "1 MARGHERITA 14.50",
+  lineTotalCents: 1450,
   unitPriceCents: 1450,
   quantity: 1,
   confidence: 0.97,
@@ -33,7 +34,7 @@ const item: Item = {
 const receipt: Receipt = {
   id: "r1",
   merchant: "Luigi's",
-  items: [item, { ...item, id: "i2", name: "Happy hour discount", rawText: "DISC -2.00", unitPriceCents: -200 }],
+  items: [item, { ...item, id: "i2", name: "Happy hour discount", rawText: "DISC -2.00", lineTotalCents: -200, unitPriceCents: undefined, quantity: undefined }],
   subtotalCents: 1250,
   taxCents: 111,
   tipCents: 250,
@@ -78,21 +79,27 @@ const breakdown: Breakdown = {
 };
 
 describe("ItemSchema", () => {
-  it("accepts a valid item, including negative prices and fractional quantity", () => {
+  it("accepts a valid item, including discounts, unreadable prices and fractional quantity", () => {
     ok(ItemSchema, item);
-    ok(ItemSchema, { ...item, unitPriceCents: -200 });
+    ok(ItemSchema, { ...item, lineTotalCents: -200, unitPriceCents: -200 });
+    ok(ItemSchema, { ...item, lineTotalCents: null });
     ok(ItemSchema, { ...item, quantity: 0.5 });
+    const { unitPriceCents: _u, quantity: _q, ...lineTotalOnly } = item;
+    ok(ItemSchema, lineTotalOnly);
   });
 
   it("rejects malformed items", () => {
+    bad(ItemSchema, { ...item, lineTotalCents: "$12" });
+    bad(ItemSchema, { ...item, lineTotalCents: 12.5 }); // not whole cents
     bad(ItemSchema, { ...item, unitPriceCents: "$12" });
-    bad(ItemSchema, { ...item, unitPriceCents: 12.5 }); // not whole cents
     bad(ItemSchema, { ...item, confidence: 1.2 });
     bad(ItemSchema, { ...item, confidence: -0.1 });
     bad(ItemSchema, { ...item, quantity: 0 });
     bad(ItemSchema, { ...item, name: "" });
     const { receiptId: _, ...noReceiptId } = item;
     bad(ItemSchema, noReceiptId);
+    const { lineTotalCents: _l, ...noLineTotal } = item;
+    bad(ItemSchema, noLineTotal); // must be present, even if null
   });
 });
 
@@ -105,7 +112,7 @@ describe("ReceiptSchema", () => {
   it("rejects malformed receipts", () => {
     bad(ReceiptSchema, { ...receipt, totalCents: "$16.11" });
     bad(ReceiptSchema, { ...receipt, taxCents: -1 });
-    bad(ReceiptSchema, { ...receipt, items: [{ ...item, unitPriceCents: "$12" }] });
+    bad(ReceiptSchema, { ...receipt, items: [{ ...item, lineTotalCents: "$12" }] });
     const { unreadableLines: _, ...noUnreadable } = receipt;
     bad(ReceiptSchema, noUnreadable);
   });

@@ -3,16 +3,18 @@
 export const receiptResponse = {
   merchant: "Luigi's",
   items: [
-    { name: "Margherita pizza", rawText: "1 MARGHERITA 14.50", quantity: 1, unitPrice: 14.5, confidence: 0.97 },
-    { name: "Beer", rawText: "2 IPA @ 7.25", quantity: 2, unitPrice: 7.25, confidence: 0.9 },
-    { name: "Discount", rawText: "HH DISC -2.00", quantity: 1, unitPrice: -2, confidence: 0.8 },
+    { name: "Margherita pizza", rawText: "MARGHERITA 14.50", lineTotal: 14.5, confidence: 0.97 },
+    { name: "Beer", rawText: "2 IPA @ 7.25 14.50", lineTotal: 14.5, unitPrice: 7.25, quantity: 2, confidence: 0.9 },
+    { name: "Wings", rawText: "3 WINGS FOR 10.00", lineTotal: 10, unitPrice: null, quantity: 3, confidence: 0.85 },
+    { name: "Discount", rawText: "HH DISC -2.00", lineTotal: -2, confidence: 0.8 },
+    { name: "Dessert", rawText: "TIRAMISU ##.##", lineTotal: null, confidence: 0.3 },
   ],
-  subtotal: 27,
-  tax: 2.4,
+  subtotal: 37,
+  tax: 3.29,
   tip: null,
   serviceCharge: null,
-  total: 29.4,
-  unreadableLines: ["##.## ??"],
+  total: 40.29,
+  unreadableLines: ["THANK Y0U ##"],
 };
 
 export const attributionResponse = {

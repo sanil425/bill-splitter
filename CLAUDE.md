@@ -41,6 +41,9 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 - `src/lib/schemas/domain.ts`: what the app stores (cents, ids). `ai.ts`: what models return (dollars; people referenced by name). `convert.ts` maps AI → domain.
 - Types come from `z.infer` only; no hand-written duplicate types. Import from `@/lib/schemas`.
 - Schemas check shape only; cross-references (item/person ids exist, rule conflicts) belong to the validator.
+- `Item.lineTotalCents` is the only item number the maths uses. It's `null` when the price is unreadable (the validator must block until fixed). `unitPriceCents` and `quantity` are optional and display-only. The vision model returns `lineTotal` (dollars, nullable); `unreadableLines` is only for text that can't be tied to any item.
+- Calculator (`calculate(split)` in `src/lib/calculator`): pure, integer cents, every split goes through `allocate()` (largest remainder; ties go to earlier people in `split.people`). It throws a typed `CalculationError` (with a `code`) instead of ever returning a doubtful number.
+- Calculator choices: proportional charges ignore negative item subtotals and fall back to an equal split if nobody has a positive subtotal; `covers_fraction` on a zero/negative total moves nothing; a rule may not push anyone's total below zero (or further below).
 
 ## Commands
 

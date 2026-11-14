@@ -20,10 +20,15 @@ export const ItemSchema = z.object({
   name: z.string().min(1),
   /** The line as printed on the receipt (empty for typed-in items). */
   rawText: z.string(),
-  /** Price of one unit. Negative for discounts. */
-  unitPriceCents: CentsSchema,
-  /** Usually a whole number, but fractions (e.g. 0.5 lb) are allowed. */
-  quantity: z.number().positive(),
+  /**
+   * What this line costs in total. The ONLY number the maths uses.
+   * Negative for discounts; null when the price couldn't be read.
+   */
+  lineTotalCents: CentsSchema.nullable(),
+  /** Display only. Price of one unit, if the receipt shows it. */
+  unitPriceCents: CentsSchema.optional(),
+  /** Display only. Fractions (e.g. 0.5 lb) are allowed. */
+  quantity: z.number().positive().optional(),
   confidence: ConfidenceSchema,
 });
 export type Item = z.infer<typeof ItemSchema>;
@@ -37,7 +42,7 @@ export const ReceiptSchema = z.object({
   tipCents: NonNegativeCentsSchema.optional(),
   serviceChargeCents: NonNegativeCentsSchema.optional(),
   totalCents: CentsSchema.optional(),
-  /** Raw text of lines the vision model could not read. */
+  /** Raw text the vision model couldn't tie to any item. */
   unreadableLines: z.array(z.string()),
 });
 export type Receipt = z.infer<typeof ReceiptSchema>;

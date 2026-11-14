@@ -4,19 +4,26 @@
  */
 
 /**
+ * Round to the nearest integer, halves away from zero (2.5 -> 3, -2.5 -> -3).
+ * Never returns -0.
+ *
+ * Float noise is removed first (rounding to 6 decimal places), because
+ * e.g. 1.005 * 100 === 100.49999999999999 should count as a half.
+ */
+export function roundHalfAwayFromZero(x: number): number {
+  const r = Math.round(Number(Math.abs(x).toFixed(6)));
+  return x < 0 && r !== 0 ? -r : r;
+}
+
+/**
  * Convert a dollar amount to integer cents, rounding half a cent away from
  * zero (1.005 -> 101, -1.005 -> -101).
- *
- * `dollars * 100` alone is not enough: 1.005 * 100 === 100.49999999999999.
- * Rounding to 6 decimal places first removes that float noise before the
- * real rounding step.
  */
 export function toCents(dollars: number): number {
   if (!Number.isFinite(dollars)) {
     throw new RangeError(`toCents: expected a finite number, got ${dollars}`);
   }
-  const cents = Math.round(Number((Math.abs(dollars) * 100).toFixed(6)));
-  return dollars < 0 && cents !== 0 ? -cents : cents;
+  return roundHalfAwayFromZero(dollars * 100);
 }
 
 /** Format integer cents as US dollars: 1250 -> "$12.50", -99 -> "-$0.99". */

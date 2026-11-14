@@ -20,17 +20,28 @@ describe("receiptFromAi", () => {
       id: "r1",
       merchant: "Luigi's",
       items: [
-        { id: "id1", receiptId: "r1", name: "Margherita pizza", rawText: "1 MARGHERITA 14.50", unitPriceCents: 1450, quantity: 1, confidence: 0.97 },
-        { id: "id2", receiptId: "r1", name: "Beer", rawText: "2 IPA @ 7.25", unitPriceCents: 725, quantity: 2, confidence: 0.9 },
-        { id: "id3", receiptId: "r1", name: "Discount", rawText: "HH DISC -2.00", unitPriceCents: -200, quantity: 1, confidence: 0.8 },
+        { id: "id1", receiptId: "r1", name: "Margherita pizza", rawText: "MARGHERITA 14.50", lineTotalCents: 1450, confidence: 0.97 },
+        { id: "id2", receiptId: "r1", name: "Beer", rawText: "2 IPA @ 7.25 14.50", lineTotalCents: 1450, unitPriceCents: 725, quantity: 2, confidence: 0.9 },
+        { id: "id3", receiptId: "r1", name: "Wings", rawText: "3 WINGS FOR 10.00", lineTotalCents: 1000, quantity: 3, confidence: 0.85 },
+        { id: "id4", receiptId: "r1", name: "Discount", rawText: "HH DISC -2.00", lineTotalCents: -200, confidence: 0.8 },
+        { id: "id5", receiptId: "r1", name: "Dessert", rawText: "TIRAMISU ##.##", lineTotalCents: null, confidence: 0.3 },
       ],
-      subtotalCents: 2700,
-      taxCents: 240,
-      totalCents: 2940,
-      unreadableLines: ["##.## ??"],
+      subtotalCents: 3700,
+      taxCents: 329,
+      totalCents: 4029,
+      unreadableLines: ["THANK Y0U ##"],
     });
     expect(receipt.tipCents).toBeUndefined();
     expect(receipt.serviceChargeCents).toBeUndefined();
+  });
+
+  it("keeps an unreadable price as null and leaves display-only fields out when absent", () => {
+    const receipt = receiptFromAi(parsed, { newId: counter() });
+    const [pizza, , wings, , dessert] = receipt.items;
+    expect(dessert.lineTotalCents).toBeNull();
+    expect(pizza.unitPriceCents).toBeUndefined();
+    expect(pizza.quantity).toBeUndefined();
+    expect(wings.unitPriceCents).toBeUndefined(); // null from the model -> undefined
   });
 
   it("generates a receipt id when none is given", () => {
@@ -42,7 +53,7 @@ describe("receiptFromAi", () => {
   it("uses random UUIDs by default", () => {
     const receipt = receiptFromAi(parsed);
     expect(receipt.id).toMatch(/^[0-9a-f-]{36}$/);
-    expect(new Set(receipt.items.map((i) => i.id)).size).toBe(3);
+    expect(new Set(receipt.items.map((i) => i.id)).size).toBe(5);
   });
 
   it("drops a blank merchant and produces a valid domain receipt", () => {
