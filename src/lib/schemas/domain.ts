@@ -8,6 +8,7 @@ import {
   CentsSchema,
   ChargeKindSchema,
   ConfidenceSchema,
+  FlagCodeSchema,
   FlagSeveritySchema,
   IdSchema,
   NonNegativeCentsSchema,
@@ -114,8 +115,19 @@ export const ChargeSettingsSchema = z.object({
 export type ChargeSettings = z.infer<typeof ChargeSettingsSchema>;
 
 export const FlagSchema = z.object({
+  /**
+   * Deterministic for validator flags: code + the ids involved
+   * (e.g. "ITEM_NO_PRICE:item_3"), so resolved state survives re-validation.
+   */
   id: IdSchema,
+  code: FlagCodeSchema,
   severity: FlagSeveritySchema,
+  /**
+   * Whether the user may mark it resolved without changing the split
+   * ("yes, the receipt total really is off"). Blocking flags with
+   * confirmable: false must be fixed. Warnings can always be dismissed.
+   */
+  confirmable: z.boolean(),
   source: z.enum(["receipt", "attribution", "validator"]),
   message: z.string().min(1),
   itemId: IdSchema.optional(),

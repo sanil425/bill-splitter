@@ -110,7 +110,9 @@ export function attributionFromAi(
   const flags = res.flags.map((f) =>
     FlagSchema.parse({
       id: newId(),
+      code: "MODEL_FLAG",
       severity: f.severity,
+      confirmable: true,
       source: "attribution",
       message: f.message,
       itemId: f.itemId ?? undefined,

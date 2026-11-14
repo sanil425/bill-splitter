@@ -114,7 +114,7 @@ describe("attributionFromAi", () => {
 
   it("turns model flags into unresolved attribution flags", () => {
     expect(result.flags).toEqual([
-      { id: "id4", severity: "warning", source: "attribution", message: "Not sure who had the beer", itemId: "i2", resolved: false },
+      { id: "id4", code: "MODEL_FLAG", severity: "warning", confirmable: true, source: "attribution", message: "Not sure who had the beer", itemId: "i2", resolved: false },
     ]);
   });
 

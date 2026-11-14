@@ -22,3 +22,36 @@ export type ChargeKind = z.infer<typeof ChargeKindSchema>;
 
 export const FlagSeveritySchema = z.enum(["blocking", "warning"]);
 export type FlagSeverity = z.infer<typeof FlagSeveritySchema>;
+
+/**
+ * What a flag is about. Each validator check has its own code; MODEL_FLAG is
+ * a note from the receipt parser or attribution model.
+ */
+export const FlagCodeSchema = z.enum([
+  // Blocking, must fix
+  "ITEM_NO_PRICE",
+  "ITEM_UNASSIGNED",
+  "HOST_MISSING",
+  "RULE_UNKNOWN_PERSON",
+  "RULE_SELF",
+  "COVERAGE_OVER_100",
+  "CHARGE_NO_ITEMS",
+  "DUPLICATE_PERSON_ID",
+  "DUPLICATE_ITEM_ID",
+  "DUPLICATE_ASSIGNMENT",
+  "ASSIGNMENT_UNKNOWN_ITEM",
+  "SHARE_UNKNOWN_PERSON",
+  "INVALID_WEIGHT",
+  "INVALID_AMOUNT",
+  "CALCULATION_FAILED",
+  // Blocking, confirmable
+  "SUBTOTAL_MISMATCH",
+  // Warnings
+  "UNREADABLE_LINE",
+  "LOW_CONFIDENCE",
+  "TOTAL_MISMATCH",
+  "PERSON_NO_ITEMS",
+  // From an AI model (severity set by the model; always confirmable)
+  "MODEL_FLAG",
+]);
+export type FlagCode = z.infer<typeof FlagCodeSchema>;

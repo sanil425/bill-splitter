@@ -177,7 +177,15 @@ describe("ChargeSettingsSchema", () => {
 });
 
 describe("FlagSchema", () => {
-  const flag = { id: "f1", severity: "blocking", source: "validator", message: "Items don't add up", resolved: false };
+  const flag = {
+    id: "SUBTOTAL_MISMATCH:r1",
+    code: "SUBTOTAL_MISMATCH",
+    severity: "blocking",
+    confirmable: true,
+    source: "validator",
+    message: "Items don't add up",
+    resolved: false,
+  };
 
   it("accepts a valid flag", () => {
     ok(FlagSchema, flag);
@@ -187,6 +195,11 @@ describe("FlagSchema", () => {
   it("rejects malformed flags", () => {
     bad(FlagSchema, { ...flag, severity: "critical" });
     bad(FlagSchema, { ...flag, source: "user" });
+    bad(FlagSchema, { ...flag, code: "SOMETHING_ELSE" });
+    const { code: _c, ...noCode } = flag;
+    bad(FlagSchema, noCode);
+    const { confirmable: _k, ...noConfirmable } = flag;
+    bad(FlagSchema, noConfirmable);
     bad(FlagSchema, { ...flag, message: "" });
     const { resolved: _, ...noResolved } = flag;
     bad(FlagSchema, noResolved);
