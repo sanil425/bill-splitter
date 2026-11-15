@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { roundHalfAwayFromZero } from "../money";
 import { allocate } from "./allocate";
 import { calculate } from "./calculate";
 import { CalculationError } from "./errors";
-import { chance, int, mulberry32, randomSplit } from "./test-helpers";
+import { chance, int, mulberry32, pick, randomSplit } from "./test-helpers";
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
@@ -53,8 +54,30 @@ describe("calculator invariants (500 random splits)", () => {
       }
     }
 
-    // Make sure the test is mostly exercising successful calculations.
-    expect(calculated).toBeGreaterThan(450);
+    // Make sure the test is mostly exercising successful calculations. (covers_fraction
+    // uses pre-rule totals, so it can legitimately over-move after an earlier rule
+    // already reduced the beneficiary; those runs refuse with NEGATIVE_TOTAL.)
+    expect(calculated).toBeGreaterThan(425);
+  });
+
+  it("covers_fraction alone never over-moves, and coverage adding to 100% leaves the beneficiary at exactly 0", () => {
+    const rand = mulberry32(7);
+    const fractionSets = [[1], [0.5, 0.5], [1 / 3, 1 / 3, 1 / 3], [0.25, 0.75], [0.25, 0.25, 0.5], [0.5], [0.25, 1 / 3]];
+
+    for (let run = 0; run < 300; run++) {
+      const split = randomSplit(rand, false);
+      if (split.people.length < 2) continue;
+      const [beneficiary, ...payers] = split.people.map((p) => p.id);
+      const fractions = pick(rand, fractionSets);
+      split.rules = fractions.map((fraction) => ({ type: "covers_fraction", payer: pick(rand, payers), beneficiary, fraction }));
+
+      const before = calculate({ ...split, rules: [] }).perPerson[0].totalCents;
+      const b = calculate(split); // must not throw
+      const covered = Math.min(1, sum(fractions));
+      expect(b.perPerson[0].totalCents, `run ${run}`).toBe(before - roundHalfAwayFromZero(covered * before));
+      if (covered === 1 || Math.abs(covered - 1) < 1e-9) expect(b.perPerson[0].totalCents, `run ${run}`).toBe(0);
+      expect(sum(b.perPerson.map((p) => p.totalCents)), `run ${run}`).toBe(b.grandTotalCents);
+    }
   });
 
   it("allocate adds up exactly for random totals and weights", () => {

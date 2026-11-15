@@ -45,6 +45,8 @@ type ReceiptState = {
  * 2. Per receipt, split tax, tip and service among that receipt's people
  *    (proportional to item subtotal, or equal), honouring any tip override.
  * 3. Apply custom rules in order, recording their effect as adjustments.
+ *    covers_fraction takes its fraction of the beneficiary's total before
+ *    any rules (after items and charges), not their running total.
  *
  * People appear in split.people order, which also breaks rounding ties.
  * Throws CalculationError rather than return a number it can't stand behind.
@@ -163,6 +165,10 @@ export function calculate(split: Split): Breakdown {
   const adjustments = zeros(n);
   const totalOf = (i: number) =>
     itemsTotal[i] + chargeTotals.tax[i] + chargeTotals.tip[i] + chargeTotals.service[i] + adjustments[i];
+  // Totals after items and charges, before any rule. covers_fraction applies to these.
+  const baseTotals = people.map((_, i) => totalOf(i));
+  // Fraction of each person's base total covered so far, by person index.
+  const covered = zeros(n);
 
   split.rules.forEach((rule, ruleIndex) => {
     const before = people.map((_, i) => totalOf(i));
@@ -171,9 +177,15 @@ export function calculate(split: Split): Breakdown {
 
     switch (rule.type) {
       case "covers_fraction": {
+        // The fraction is of the beneficiary's pre-rule total, so "half" + "half"
+        // covers all of it. Rounding the cumulative fraction (rather than each
+        // rule on its own) means the pieces always add up to round(sum * base).
         // Covering part of a zero or negative balance moves nothing.
         const b = personIndex(rule.beneficiary, { ruleIndex });
-        const moved = Math.max(0, roundHalfAwayFromZero(rule.fraction * before[b]));
+        const base = Math.max(0, baseTotals[b]);
+        const prev = covered[b];
+        covered[b] = Math.min(1, prev + rule.fraction);
+        const moved = roundHalfAwayFromZero(covered[b] * base) - roundHalfAwayFromZero(prev * base);
         delta[b] -= moved;
         delta[payer] += moved;
         break;

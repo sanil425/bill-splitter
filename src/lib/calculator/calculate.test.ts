@@ -192,6 +192,55 @@ describe("calculate: rules", () => {
     expect(column(b, "totalCents")).toEqual({ a: 1000, b: -300, c: 0 });
   });
 
+  it("covers_fraction uses the beneficiary's total before any rules, so two halves cover everything", () => {
+    const b = run([
+      { type: "covers_fraction", payer: "a", beneficiary: "b", fraction: 0.5 },
+      { type: "covers_fraction", payer: "c", beneficiary: "b", fraction: 0.5 },
+    ]);
+    expect(column(b, "totalCents")).toEqual({ a: 2000, b: 0, c: 2000 });
+  });
+
+  it("covers_fraction pieces add up exactly on an odd total", () => {
+    const parts = {
+      receipts: [receipt("r1", [item("i1", 1000), item("i2", 1001), item("i3", 1000)])],
+      assignments: [assign("i1", { a: 1 }), assign("i2", { b: 1 }), assign("i3", { c: 1 })],
+    };
+    const halves = run(
+      [
+        { type: "covers_fraction", payer: "a", beneficiary: "b", fraction: 0.5 },
+        { type: "covers_fraction", payer: "c", beneficiary: "b", fraction: 0.5 },
+      ],
+      parts,
+    );
+    expect(column(halves, "totalCents")).toEqual({ a: 1501, b: 0, c: 1500 });
+
+    const thirds = run(
+      Array.from({ length: 3 }, (): Rule => ({ type: "covers_fraction", payer: "a", beneficiary: "b", fraction: 1 / 3 })),
+      parts,
+    );
+    expect(column(thirds, "totalCents")).toEqual({ a: 2001, b: 0, c: 1000 });
+  });
+
+  it("covers_fraction includes the beneficiary's charges in their pre-rule total", () => {
+    const parts = { ...base, receipts: [receipt("r1", base.receipts[0].items, { taxCents: 400 })] };
+    // b: 2000 items + 200 tax = 2200; half is 1100.
+    const b = run([{ type: "covers_fraction", payer: "a", beneficiary: "b", fraction: 0.5 }], parts);
+    expect(column(b, "totalCents")).toEqual({ a: 2200, b: 1100, c: 1100 });
+  });
+
+  it("covers_fraction still throws NEGATIVE_TOTAL if earlier rules already reduced the beneficiary", () => {
+    // pays_fixed puts c at 0; covering all of c's pre-rule 1000 would push c to -1000.
+    const err = expectError(
+      () =>
+        run([
+          { type: "pays_fixed", payer: "c", amountCents: 0 },
+          { type: "covers_fraction", payer: "a", beneficiary: "c", fraction: 1 },
+        ]),
+      "NEGATIVE_TOTAL",
+    );
+    expect(err.details).toEqual({ ruleIndex: 1, personId: "c" });
+  });
+
   it("pays_charge moves everyone else's share of that charge, across all receipts", () => {
     const parts = {
       receipts: [
@@ -241,10 +290,10 @@ describe("calculate: rules", () => {
     expect(column(coverFirst, "totalCents")).toEqual({ a: 0, b: 3200, c: 800 });
     expect(column(coverFirst, "adjustmentsCents")).toEqual({ a: -1000, b: 1200, c: -200 });
 
-    // Fixed first: a 0, b 2667, c 1333; then a covers half of c's 1333.
+    // Fixed first: a 0, b 2667, c 1333; then a covers half of c's pre-rule 1000.
     const fixedFirst = run([fixed, cover]);
-    expect(column(fixedFirst, "totalCents")).toEqual({ a: 667, b: 2667, c: 666 });
-    expect(column(fixedFirst, "adjustmentsCents")).toEqual({ a: -333, b: 667, c: -334 });
+    expect(column(fixedFirst, "totalCents")).toEqual({ a: 500, b: 2667, c: 833 });
+    expect(column(fixedFirst, "adjustmentsCents")).toEqual({ a: -500, b: 667, c: -167 });
   });
 
   it("throws when a rule would make a total negative", () => {

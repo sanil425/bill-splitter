@@ -43,16 +43,20 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 - Schemas check shape only; cross-references (item/person ids exist, rule conflicts) belong to the validator.
 - `Item.lineTotalCents` is the only item number the maths uses. It's `null` when the price is unreadable (the validator must block until fixed). `unitPriceCents` and `quantity` are optional and display-only. The vision model returns `lineTotal` (dollars, nullable); `unreadableLines` is only for text that can't be tied to any item.
 - Calculator (`calculate(split)` in `src/lib/calculator`): pure, integer cents, every split goes through `allocate()` (largest remainder; ties go to earlier people in `split.people`). It throws a typed `CalculationError` (with a `code`) instead of ever returning a doubtful number.
-- Calculator choices: proportional charges ignore negative item subtotals and fall back to an equal split if nobody has a positive subtotal; `covers_fraction` on a zero/negative total moves nothing; a rule may not push anyone's total below zero (or further below).
+- Calculator choices: proportional charges ignore negative item subtotals and fall back to an equal split if nobody has a positive subtotal; `covers_fraction` takes its fraction of the beneficiary's total **before any rules** (after items and charges), so "Ali pays half of Josh's" + "Sam pays half of Josh's" leaves Josh at exactly $0 (moved amounts round the cumulative fraction, so pieces always add up); `covers_fraction` on a zero/negative pre-rule total moves nothing; rules still apply in order, and a rule may not push anyone's total below zero (or further below).
 - Flags have a `code` (`FlagCodeSchema` in `common.ts`) and `confirmable`. There are three kinds: blocking must-fix (`confirmable: false`), blocking confirmable (the user can say "yes, really"), and warnings (always dismissable). AI flags use `MODEL_FLAG` and are confirmable.
 - Validator (`validate(split)` in `src/lib/validator`): pure, returns `Flag[]`. Every code's severity and confirmability is in `FLAG_KINDS`. Validator flag ids are deterministic: `CODE:id[:id…]` (rules use `rule_<index>`), so resolved state survives re-runs. Messages use names, never ids.
 - Every precondition `calculate()` checks has its own must-fix code. When there are no must-fix flags, `validate` dry-runs `calculate()` and turns a `CalculationError` into `CALCULATION_FAILED`. Guarantee: `canCalculate(mergeFlags(split.flags, validate(split)))` ⇒ `calculate(split)` won't throw.
 - After every edit: `split.flags = mergeFlags(split.flags, validate(split))`. It keeps receipt/attribution flags, replaces validator flags, and carries resolved state by id. `resolveFlag` throws for must-fix flags; `canCalculate` ignores `resolved` on must-fix flags.
+- AI calls (`src/lib/ai`, server-only): `attribute()` uses one tool (`submit_attribution`, input schema from `z.toJSONSchema(AttributionResponseSchema)`). Current models reject forced `tool_choice`, so it's `auto` + the prompt; a reply without the call, or one failing Zod / item-id / host checks, is retried once with the errors sent back, then throws `AttributionError` (with a `code`). The model client is injectable for tests. Server-side refusal fallback is on (`fallbacks: "default"`).
+- Runtime prompts are versioned files in `prompts/` (e.g. `attribution.v1.md`), read via `loadPrompt()`; add new ones to `outputFileTracingIncludes` in `next.config.ts`. Change a prompt's behaviour → new version file, and rerun its eval.
+- Live evals (`npm run eval:<name>`) call the real API and cost money; they're never part of `npm test`.
 - Mismatch tolerance is 2 cents (`TOLERANCE_CENTS`); low confidence is < 0.8. The printed tip is ignored when `tipOverride` is set (same as the calculator).
 
 ## Commands
 
 - `npm run dev` / `build` / `lint` / `typecheck` / `test`
+- `npm run eval:attribution`: live attribution eval (needs `ANTHROPIC_API_KEY` in `.env.local`)
 - All of lint, typecheck, test and build should pass before a phase is done.
 
 ## Build plan (one prompt per phase)
