@@ -27,11 +27,13 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 
 - Next.js 16 (App Router, `src/` dir) + TypeScript strict, Tailwind v4, PWA (`src/app/manifest.ts`; no service worker yet)
 - Zod for all data shapes (`src/lib/schemas`), Vitest for tests
-- Later: Claude Sonnet (receipts + attribution), OpenAI transcription, Upstash Redis (share links + rate limits), Vercel
+- Claude Sonnet 5.5 (receipts + attribution, `@anthropic-ai/sdk`), OpenAI `gpt-transcribe` (`openai`), Upstash Redis + `@upstash/ratelimit` (rate limits now; share links later), `music-metadata` (audio duration)
+- Later: Vercel
 
 ## Layout
 
-- `src/lib/schemas`, `src/lib/calculator`, `src/lib/validator`, `src/lib/ai`
+- `src/lib/schemas`, `src/lib/calculator`, `src/lib/validator`, `src/lib/ai`, `src/lib/ratelimit`
+- `src/lib/uploads.ts` (size limits, file type sniffing, audio duration), `src/lib/http.ts` (route helpers)
 - `src/components`, `src/app/api`
 - `prompts/`: runtime prompts; `evals/`: AI pipeline test cases
 
@@ -48,8 +50,10 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 - Validator (`validate(split)` in `src/lib/validator`): pure, returns `Flag[]`. Every code's severity and confirmability is in `FLAG_KINDS`. Validator flag ids are deterministic: `CODE:id[:id…]` (rules use `rule_<index>`), so resolved state survives re-runs. Messages use names, never ids.
 - Every precondition `calculate()` checks has its own must-fix code. When there are no must-fix flags, `validate` dry-runs `calculate()` and turns a `CalculationError` into `CALCULATION_FAILED`. Guarantee: `canCalculate(mergeFlags(split.flags, validate(split)))` ⇒ `calculate(split)` won't throw.
 - After every edit: `split.flags = mergeFlags(split.flags, validate(split))`. It keeps receipt/attribution flags, replaces validator flags, and carries resolved state by id. `resolveFlag` throws for must-fix flags; `canCalculate` ignores `resolved` on must-fix flags.
-- AI calls (`src/lib/ai`, server-only): `attribute()` uses one tool (`submit_attribution`, input schema from `z.toJSONSchema(AttributionResponseSchema)`). Current models reject forced `tool_choice`, so it's `auto` + the prompt; a reply without the call, or one failing Zod / item-id / host checks, is retried once with the errors sent back, then throws `AttributionError` (with a `code`). The model client is injectable for tests. Server-side refusal fallback is on (`fallbacks: "default"`).
-- Runtime prompts are versioned files in `prompts/` (e.g. `attribution.v1.md`), read via `loadPrompt()`; add new ones to `outputFileTracingIncludes` in `next.config.ts`. Change a prompt's behaviour → new version file, and rerun its eval.
+- AI calls (`src/lib/ai`, server-only) share `callTool()` in `tool-call.ts`: one tool (input schema from the Zod schema via `toolFromSchema`), `tool_choice: auto` + the prompt (current models reject forced `tool_choice`); a reply without the call or failing the check is retried once with the errors sent back, then throws an `AiError` subclass with a `code` (`API_ERROR`, `REFUSED`, `TRUNCATED`, `INVALID_RESPONSE`). No refusal fallback. `attribute()` (`submit_attribution`, also checks item ids/host) throws `AttributionError`; `parseReceipt()` (`submit_receipt`, one image) throws `ReceiptParseError`; `transcribe()` (OpenAI, no retry loop) throws `TranscriptionError`. SDK clients live in `client.ts` and are injectable (tests pass fakes from `test-helpers.ts` or mock `getMessagesClient`/`getTranscriptionClient`). Models: `ATTRIBUTION_MODEL`, `RECEIPT_MODEL`, `TRANSCRIBE_MODEL` env vars with defaults in `config.ts`.
+- AI routes: `POST /api/attribute` (JSON), `POST /api/parse-receipt` (multipart `image`: JPEG/PNG/WebP, ≤4 MB → domain `Receipt`, 422 `NO_ITEMS` if empty), `POST /api/transcribe` (multipart `audio`: webm/mp4/m4a/mp3, ≤4 MB and ≤3 min → `{ text }`). File types come from the bytes, never the declared type. Order: validate input (400/413) → `checkRateLimit()` (429/503) → AI call (502 with `code` only, 500 for anything else). Errors are `{ error: { code, message } }`, never internals. Uploads stay under Vercel's 4.5 MB body limit, so the client must shrink photos.
+- Rate limits (`src/lib/ratelimit`): per-IP sliding window + global daily cap (UTC day), env `RATE_LIMIT_IP_REQUESTS` / `RATE_LIMIT_IP_WINDOW` / `RATE_LIMIT_DAILY_CAP` (defaults 20 per `10 m`, 500/day). Fails closed: missing Redis env, Redis errors or a >3 s check → 503 `RATE_LIMIT_UNAVAILABLE` (library timeout is off because it fails open). Tests mock `getLimiters` in `limiters.ts` with `fakeLimiters()`.
+- Runtime prompts are versioned files in `prompts/` (current: `attribution.v2.md`, `receipt.v1.md`), read via `loadPrompt()`; add new ones to `outputFileTracingIncludes` in `next.config.ts`. Change a prompt's behaviour → new version file, and rerun its eval.
 - Live evals (`npm run eval:<name>`) call the real API and cost money; they're never part of `npm test`.
 - Mismatch tolerance is 2 cents (`TOLERANCE_CENTS`); low confidence is < 0.8. The printed tip is ignored when `tipOverride` is set (same as the calculator).
 
@@ -57,6 +61,7 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 
 - `npm run dev` / `build` / `lint` / `typecheck` / `test`
 - `npm run eval:attribution`: live attribution eval (needs `ANTHROPIC_API_KEY` in `.env.local`)
+- `npm run eval:receipts`: live receipt eval over every image in `evals/receipts/`; compares with `<name>.expected.json` if present, else prints the result to save as one
 - All of lint, typecheck, test and build should pass before a phase is done.
 
 ## Build plan (one prompt per phase)

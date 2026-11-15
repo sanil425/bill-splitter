@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { BetaMessage, MessageCreateParamsNonStreaming } from "@anthropic-ai/sdk/resources/beta/messages/messages";
+import type { Message, MessageCreateParamsNonStreaming } from "@anthropic-ai/sdk/resources/messages";
 import { describe, expect, it } from "vitest";
 import type { Item } from "../schemas";
 import {
@@ -9,8 +9,8 @@ import {
   attribute,
   buildUserMessage,
   type AttributeInput,
-  type MessagesClient,
 } from "./attribute";
+import type { MessagesClient } from "./client";
 import { DEFAULT_ATTRIBUTION_MODEL } from "./config";
 import { loadPrompt } from "./prompts";
 
@@ -39,8 +39,8 @@ const valid = {
 };
 
 let toolUseCounter = 0;
-function message(content: unknown[], stop_reason = "tool_use"): BetaMessage {
-  return { id: "msg_1", type: "message", role: "assistant", model: "test", content, stop_reason } as unknown as BetaMessage;
+function message(content: unknown[], stop_reason = "tool_use"): Message {
+  return { id: "msg_1", type: "message", role: "assistant", model: "test", content, stop_reason } as unknown as Message;
 }
 const toolCall = (toolInput: unknown) =>
   message([
@@ -49,7 +49,7 @@ const toolCall = (toolInput: unknown) =>
   ]);
 
 /** Returns the queued responses in order and records every request. */
-function fakeClient(...responses: (BetaMessage | Error)[]) {
+function fakeClient(...responses: (Message | Error)[]) {
   const calls: MessageCreateParamsNonStreaming[] = [];
   const client: MessagesClient = {
     async create(params) {
@@ -153,11 +153,15 @@ describe("attribute()", () => {
 });
 
 describe("attribution request", () => {
-  it("loads the v1 prompt from /prompts", () => {
+  it("loads the v2 prompt from /prompts", () => {
+    expect(ATTRIBUTION_PROMPT).toBe("attribution.v2");
     const prompt = loadPrompt(ATTRIBUTION_PROMPT);
     expect(prompt).toContain(ATTRIBUTION_TOOL_NAME);
     expect(prompt).toContain("never do arithmetic");
     expect(prompt).toContain("covers_fraction");
+    // v2: unclaimed items are left to the validator.
+    expect(prompt).toContain("Don't flag it");
+    expect(prompt).not.toContain("Nobody mentioned");
   });
 
   it("sends the prompt, the one tool, and the host, items and notes", async () => {
@@ -178,6 +182,9 @@ describe("attribution request", () => {
     expect(tool.input_schema.required).toEqual(["people", "assignments"]);
     expect(tool.input_schema.$schema).toBeUndefined();
     expect(req.tool_choice).toEqual({ type: "auto", disable_parallel_tool_use: true });
+    // No refusal fallback.
+    expect(req).not.toHaveProperty("fallbacks");
+    expect(req).not.toHaveProperty("betas");
 
     const user = req.messages[0];
     expect(user.role).toBe("user");

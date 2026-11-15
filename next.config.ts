@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Runtime prompts are read from disk, so make sure they ship with the routes that use them.
   outputFileTracingIncludes: {
-    "/api/attribute": ["./prompts/attribution.v1.md"],
+    "/api/attribute": ["./prompts/attribution.v2.md"],
+    "/api/parse-receipt": ["./prompts/receipt.v1.md"],
   },
   turbopack: {
     rules: {

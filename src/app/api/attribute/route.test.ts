@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Limiters } from "@/lib/ratelimit";
+import { deny, fakeLimiters } from "@/lib/ratelimit/test-helpers";
 import type { AttributionResponse } from "@/lib/schemas";
+
+const fakes = vi.hoisted(() => ({ limiters: null as Limiters | null }));
+vi.mock("@/lib/ratelimit/limiters", async (importActual) => ({
+  ...(await importActual<typeof import("@/lib/ratelimit/limiters")>()),
+  getLimiters: () => fakes.limiters,
+}));
 
 vi.mock("@/lib/ai/attribute", async (importActual) => ({
   ...(await importActual<typeof import("@/lib/ai/attribute")>()),
@@ -41,6 +49,7 @@ const post = (payload: unknown) =>
 
 beforeEach(() => {
   mockAttribute.mockReset();
+  fakes.limiters = fakeLimiters().limiters;
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -89,6 +98,17 @@ describe("POST /api/attribute", () => {
     const json = await res.json();
     expect(json).toEqual({ error: { code: "INVALID_RESPONSE", message: "The AI response didn't pass validation" } });
     expect(JSON.stringify(json)).not.toContain("secret detail");
+  });
+
+  it("returns 429 when rate limited and 503 when Redis is unavailable, without calling the model", async () => {
+    fakes.limiters = fakeLimiters(deny()).limiters;
+    const limited = await post(body);
+    expect(limited.status).toBe(429);
+    expect((await limited.json()).error.code).toBe("RATE_LIMITED");
+
+    fakes.limiters = null;
+    expect((await post(body)).status).toBe(503);
+    expect(mockAttribute).not.toHaveBeenCalled();
   });
 
   it("returns 500 without a stack trace for anything unexpected", async () => {
