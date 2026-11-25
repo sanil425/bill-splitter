@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SplitIt Capture</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#047857}a:hover{color:#065F46}
+.h{font-family:'Space Grotesk',Inter,sans-serif}
+.ib{width:44px;height:44px;border-radius:12px;border:1px solid #E7E5E4;background:#fff;display:flex;align-items:center;justify-content:center;color:#1C1917;padding:0}
+.card{background:#fff;border:1px solid #E7E5E4;border-radius:16px;padding:14px}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#57534E}
+.muted{color:#57534E}
+.thumb{width:96px;height:128px;border-radius:12px;flex:none}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #FAFAF9; font-family: Inter, sans-serif; color: #1C1917; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 12px; padding: 20px 20px 8px">
+<button class="ib" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<div style="flex: 1"><div class="h" style="font-size: 20px; font-weight: 700">New split</div><div class="muted" style="font-size: 13px">Step 1 of 3 · Add</div></div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 22px; padding: 16px 20px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div class="lbl">Receipts</div>
+<div style="display: flex; gap: 10px">
+<div class="thumb" style="background: repeating-linear-gradient(0deg, #fff 0 10px, #F5F5F4 10px 12px); border: 1px solid #D6D3D1; display: flex; align-items: flex-end; padding: 8px; font-size: 12px; font-weight: 600">Receipt 1</div>
+<button class="thumb" style="border: 1.5px dashed #A8A29E; background: transparent; color: #44403C; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: 500 13px Inter, sans-serif"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Add photo</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div class="lbl">Who had what</div>
+<div class="card" style="display: flex; align-items: center; gap: 12px">
+<button class="ib" aria-label="Play voice note" style="border-radius: 999px; background: #ECFDF5; border-color: #A7F3D0; color: #065F46"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button>
+<div style="flex: 1"><div style="font-weight: 600; font-size: 15px">Voice note</div><div class="muted" style="font-size: 13px">0:42</div></div>
+<button class="ib" aria-label="Delete voice note" style="border: 0; background: transparent; color: #57534E"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button>
+</div>
+<div class="card" style="font-size: 15px; line-height: 1.45">Ali and I split the crab roll, I had more of it. Josh had the pad thai and a Coke.</div>
+</div>
+</div>
+<div style="padding: 12px 20px 28px; display: flex; flex-direction: column; gap: 12px; background: #fff; border-top: 1px solid #E7E5E4">
+<div style="display: flex; gap: 10px; align-items: center">
+<label for="msg" style="position: absolute; left: -9999px">Message</label>
+<input id="msg" placeholder="Type who had what…" style="flex: 1; height: 48px; border-radius: 14px; border: 1px solid #D6D3D1; padding: 0 14px; font: 15px Inter, sans-serif; background: #FAFAF9">
+<button class="ib" aria-label="Take receipt photo" style="width: 48px; height: 48px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg></button>
+<button aria-label="Record voice note" style="width: 48px; height: 48px; border-radius: 999px; border: 0; background: {{accent}}; color: #fff; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0014 0M12 18v3"></path></svg></button>
+</div>
+<button style="height: 52px; border: 0; border-radius: 14px; background: {{accent}}; color: #fff; font: 600 16px Inter, sans-serif">Process</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#047857"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return { accent: this.props.accent ?? '#047857' };
+}
+}
+</script>
+</body>
+</html>

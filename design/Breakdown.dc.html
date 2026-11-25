@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SplitIt Breakdown</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#047857}a:hover{color:#065F46}
+.h{font-family:'Space Grotesk',Inter,sans-serif}
+.ib{width:44px;height:44px;border-radius:12px;border:1px solid #E7E5E4;background:#fff;display:flex;align-items:center;justify-content:center;color:#1C1917;padding:0}
+.card{background:#fff;border:1px solid #E7E5E4;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.muted{color:#57534E}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.av{width:36px;height:36px;border-radius:999px;color:#fff;font:600 14px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.S{background:#047857}.A{background:#1D4ED8}.J{background:#C2410C}.M{background:#6D28D9}
+.amt{font-family:'Space Grotesk',Inter,sans-serif;font-size:22px;font-weight:700}
+.acts{display:flex;gap:8px}
+.sb{flex:1;height:44px;border-radius:12px;font:600 15px Inter,sans-serif}
+.li{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+</style>
+</helmet>
+<div style="width: 390px; height: 1120px; background: #FAFAF9; font-family: Inter, sans-serif; color: #1C1917; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 12px; padding: 20px 20px 8px">
+<button class="ib" aria-label="Back to review"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<div style="flex: 1"><div class="h" style="font-size: 20px; font-weight: 700">Breakdown</div><div class="muted" style="font-size: 13px">Step 3 of 3 · Send</div></div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 12px 20px 20px">
+<div style="border-radius: 16px; background: {{accent}}; color: #fff; padding: 18px 16px">
+<div style="font-size: 14px; opacity: 0.92">Osushi Ardmore · 4 people · $187.36</div>
+<div class="h" style="font-size: 30px; font-weight: 700; margin-top: 6px">You're owed $128.96</div>
+</div>
+<div class="card">
+<div class="row"><span style="display: flex; align-items: center; gap: 10px"><span class="av S">S</span><span><span style="font-weight: 600; font-size: 16px">You</span><br><span class="muted" style="font-size: 13px">Your share</span></span></span><span class="amt">$58.40</span></div>
+</div>
+<div class="card">
+<div class="row"><span style="display: flex; align-items: center; gap: 10px"><span class="av A">A</span><span style="font-weight: 600; font-size: 16px">Ali</span></span><span class="amt">$49.33</span></div>
+<div class="acts"><button class="sb" style="border: 0; background: {{accent}}; color: #fff">Text</button><button class="sb" style="border: 1px solid #D6D3D1; background: #fff; color: #1C1917">Venmo</button></div>
+</div>
+<div class="card">
+<div class="row"><span style="display: flex; align-items: center; gap: 10px"><span class="av J">J</span><span style="font-weight: 600; font-size: 16px">Josh</span></span><span class="amt">$22.21</span></div>
+<div style="border-top: 1px solid #F0EFEE; padding-top: 8px">
+<div class="li"><span>Shrimp Pad Thai</span><span>$18.00</span></div>
+<div class="li"><span>Coke (1 of 2)</span><span>$2.95</span></div>
+<div class="li muted"><span>Tax (share of $10.61)</span><span>$1.26</span></div>
+</div>
+<div class="acts"><button class="sb" style="border: 0; background: {{accent}}; color: #fff">Text</button><button class="sb" style="border: 1px solid #D6D3D1; background: #fff; color: #1C1917">Venmo</button></div>
+</div>
+<div class="card">
+<div class="row"><span style="display: flex; align-items: center; gap: 10px"><span class="av M">M</span><span><span style="font-weight: 600; font-size: 16px">Maya</span><br><span class="muted" style="font-size: 13px">You covered half</span></span></span><span class="amt">$57.42</span></div>
+<div class="acts"><button class="sb" style="border: 0; background: {{accent}}; color: #fff">Text</button><button class="sb" style="border: 1px solid #D6D3D1; background: #fff; color: #1C1917">Venmo</button></div>
+</div>
+</div>
+<div style="padding: 12px 20px 28px; background: #fff; border-top: 1px solid #E7E5E4; display: flex; gap: 10px">
+<button style="flex: 1; height: 52px; border-radius: 14px; border: 1px solid #D6D3D1; background: #fff; font: 600 16px Inter, sans-serif; color: #1C1917">Copy link</button>
+<button style="flex: 1; height: 52px; border-radius: 14px; border: 0; background: #1C1917; font: 600 16px Inter, sans-serif; color: #fff">Done</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#047857"},"$preview":{"width":390,"height":1120}}'>
+class Component extends DCLogic {
+renderVals() {
+return { accent: this.props.accent ?? '#047857' };
+}
+}
+</script>
+</body>
+</html>

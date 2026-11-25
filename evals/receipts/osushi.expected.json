@@ -1,0 +1,26 @@
+{
+  "merchant": "Osushi Ardmore",
+  "items": [
+    { "name": "Coke", "lineTotalCents": 590 },
+    { "name": "Sprite", "lineTotalCents": 295 },
+    { "name": "Japanese Soda", "lineTotalCents": 790 },
+    { "name": "Japanese Green Tea", "lineTotalCents": 195 },
+    { "name": "Crab Shack Roll (10 Pcs)", "lineTotalCents": 1995 },
+    { "name": "Paradise Roll", "lineTotalCents": 1895 },
+    { "name": "Eel Avocado Roll", "lineTotalCents": 850 },
+    { "name": "Shrimp Pad Thai (no shrimp, exchange chicken)", "lineTotalCents": 1800 },
+    { "name": "Coke", "lineTotalCents": 590 },
+    { "name": "Mango Avocado Roll", "lineTotalCents": 595 },
+    { "name": "Cucumber Roll", "lineTotalCents": 595 },
+    { "name": "Peanut Avocado Roll", "lineTotalCents": 595 },
+    { "name": "O.M.G Roll", "lineTotalCents": 1795 },
+    { "name": "Tiger Roll", "lineTotalCents": 1695 },
+    { "name": "Vegetable Fried Rice", "lineTotalCents": 1600 },
+    { "name": "Kimchi Fried Rice", "lineTotalCents": 1800 }
+  ],
+  "subtotalCents": 17675,
+  "taxCents": 1061,
+  "tipCents": null,
+  "serviceChargeCents": null,
+  "totalCents": 18736
+}

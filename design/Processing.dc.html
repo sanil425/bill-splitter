@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SplitIt Processing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#047857}a:hover{color:#065F46}
+.h{font-family:'Space Grotesk',Inter,sans-serif}
+.muted{color:#57534E}
+.step{display:flex;gap:14px;align-items:flex-start}
+.dot{width:32px;height:32px;border-radius:999px;flex:none;display:flex;align-items:center;justify-content:center}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #FAFAF9; font-family: Inter, sans-serif; color: #1C1917; display: flex; flex-direction: column; justify-content: center; padding: 32px 28px; gap: 36px">
+<div>
+<div class="h" style="font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Working it out</div>
+<div class="muted" style="font-size: 15px; margin-top: 6px">This usually takes 10–20 seconds.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 22px">
+<div class="step">
+<div class="dot" style="background: {{accent}}; color: #fff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></div>
+<div><div style="font-weight: 600; font-size: 16px">Reading receipt</div><div class="muted" style="font-size: 14px">16 items found</div></div>
+</div>
+<div class="step">
+<div class="dot" style="background: {{accent}}; color: #fff"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></div>
+<div><div style="font-weight: 600; font-size: 16px">Transcribing voice note</div><div class="muted" style="font-size: 14px">Done</div></div>
+</div>
+<div class="step">
+<div class="dot" style="border: 3px solid #A7F3D0; border-top-color: {{accent}}"></div>
+<div><div style="font-weight: 600; font-size: 16px">Matching people to items</div><div class="muted" style="font-size: 14px">In progress</div></div>
+</div>
+<div class="step">
+<div class="dot" style="border: 2px solid #D6D3D1"></div>
+<div><div style="font-weight: 600; font-size: 16px; color: #57534E">Checking the maths</div></div>
+</div>
+</div>
+<a href="#" style="font-size: 15px; font-weight: 600; align-self: flex-start">Cancel</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#047857"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return { accent: this.props.accent ?? '#047857' };
+}
+}
+</script>
+</body>
+</html>

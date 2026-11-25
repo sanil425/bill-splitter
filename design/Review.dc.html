@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SplitIt Review</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#047857}a:hover{color:#065F46}
+.h{font-family:'Space Grotesk',Inter,sans-serif}
+.ib{width:44px;height:44px;border-radius:12px;border:1px solid #E7E5E4;background:#fff;display:flex;align-items:center;justify-content:center;color:#1C1917;padding:0}
+.card{background:#fff;border:1px solid #E7E5E4;border-radius:16px}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#57534E}
+.muted{color:#57534E}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.av{width:28px;height:28px;border-radius:999px;color:#fff;font:600 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;border:0;padding:0}
+.S{background:#047857}.A{background:#1D4ED8}.J{background:#C2410C}.M{background:#6D28D9}
+.it{padding:12px 14px;border-top:1px solid #F0EFEE;display:flex;flex-direction:column;gap:8px}
+.chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.w{font-size:12px;font-weight:600;color:#44403C;margin-right:4px}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.pill{height:36px;padding:0 14px;border-radius:999px;border:1px solid #D6D3D1;background:#fff;font:500 14px Inter,sans-serif;color:#1C1917}
+.pill.on{background:#ECFDF5;border-color:#047857;color:#065F46}
+.flag{display:flex;gap:10px;align-items:flex-start;padding:12px 14px}
+.fb{height:36px;padding:0 14px;border-radius:10px;font:600 14px Inter,sans-serif;flex:none}
+</style>
+</helmet>
+<div style="width: 390px; height: 1480px; background: #FAFAF9; font-family: Inter, sans-serif; color: #1C1917; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 12px; padding: 20px 20px 8px">
+<button class="ib" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<div style="flex: 1"><div class="h" style="font-size: 20px; font-weight: 700">Review</div><div class="muted" style="font-size: 13px">Step 2 of 3 · Check</div></div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 22px; padding: 12px 20px 20px">
+<div class="card" style="overflow: hidden">
+<div class="flag" style="background: #FFF1E6">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A3412" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>
+<div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #9A3412; text-transform: uppercase; letter-spacing: .04em">Needs fixing</div><div style="font-size: 14px; margin-top: 2px">Which Coke is Josh's? There are two Coke lines.</div></div>
+<button class="fb" style="border: 0; background: #9A3412; color: #fff">Pick</button>
+</div>
+<div class="flag" style="border-top: 1px solid #F0EFEE">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57534E" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.5"></path></svg>
+<div style="flex: 1"><div style="font-size: 12px; font-weight: 700; color: #57534E; text-transform: uppercase; letter-spacing: .04em">Check</div><div style="font-size: 14px; margin-top: 2px">Eel Avocado Roll price was hard to read. Is $8.50 right?</div></div>
+<button class="fb" style="border: 1px solid #D6D3D1; background: #fff; color: #1C1917">Yes</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div class="row"><div class="lbl">People</div><a href="#" style="font-size: 14px; font-weight: 600">Edit</a></div>
+<div class="chips">
+<span class="pill on" style="display: inline-flex; align-items: center; gap: 8px; padding-left: 4px"><span class="av S">S</span>Sanil (you)</span>
+<span class="pill" style="display: inline-flex; align-items: center; gap: 8px; padding-left: 4px"><span class="av A">A</span>Ali</span>
+<span class="pill" style="display: inline-flex; align-items: center; gap: 8px; padding-left: 4px"><span class="av J">J</span>Josh</span>
+<span class="pill" style="display: inline-flex; align-items: center; gap: 8px; padding-left: 4px"><span class="av M">M</span>Maya</span>
+<button class="pill" aria-label="Add person">+ Add</button>
+</div>
+</div>
+<div class="card" style="overflow: hidden">
+<div class="row" style="padding: 14px"><div><div style="font-weight: 600; font-size: 16px">Osushi Ardmore</div><div class="muted" style="font-size: 13px">16 items · tap a person to assign</div></div><a href="#" style="font-size: 14px; font-weight: 600">Photo</a></div>
+<div class="it" style="background: #FFF7F0">
+<div class="row"><span style="font-size: 15px">2× Coke</span><span style="font-size: 15px; font-weight: 600">$5.90</span></div>
+<div class="chips"><span class="tag" style="background: #FFE4D1; color: #9A3412">Unassigned</span></div>
+</div>
+<div class="it">
+<div class="row"><span style="font-size: 15px">Sprite</span><span style="font-size: 15px; font-weight: 600">$2.95</span></div>
+<div class="chips"><span class="av A">A</span></div>
+</div>
+<div class="it">
+<div class="row"><span style="font-size: 15px">2× Japanese Soda</span><span style="font-size: 15px; font-weight: 600">$7.90</span></div>
+<div class="chips"><span class="av S">S</span><span class="av M">M</span></div>
+</div>
+<div class="it">
+<div class="row"><span style="font-size: 15px">Crab Shack Roll (10 pcs)</span><span style="font-size: 15px; font-weight: 600">$19.95</span></div>
+<div class="chips"><span class="av S">S</span><span class="w">×2</span><span class="av A">A</span><span class="w">×1</span></div>
+</div>
+<div class="it">
+<div class="row"><span style="font-size: 15px">Paradise Roll</span><span style="font-size: 15px; font-weight: 600">$18.95</span></div>
+<div class="chips"><span class="av M">M</span></div>
+</div>
+<div class="it">
+<div class="row"><span style="font-size: 15px">Eel Avocado Roll</span><span style="font-size: 15px; font-weight: 600">$8.50</span></div>
+<div class="chips"><span class="av A">A</span><span class="tag" style="background: #F5F5F4; color: #44403C">Check price</span></div>
+</div>
+<div class="it">
+<div class="row"><span style="font-size: 15px">Shrimp Pad Thai</span><span style="font-size: 15px; font-weight: 600">$18.00</span></div>
+<div class="muted" style="font-size: 13px; margin-top: -4px">No shrimp, chicken instead</div>
+<div class="chips"><span class="av J">J</span></div>
+</div>
+<button style="width: 100%; height: 48px; border: 0; border-top: 1px solid #F0EFEE; background: #fff; font: 600 14px Inter, sans-serif; color: #047857">Show 9 more items</button>
+</div>
+<div class="card" style="padding: 14px; display: flex; flex-direction: column; gap: 14px">
+<div class="lbl">Tax and tip</div>
+<div class="row"><span style="font-size: 15px">Tax</span><span style="font-size: 15px; font-weight: 600">$10.61</span></div>
+<div class="chips" role="group" aria-label="Split tax"><button class="pill on">Proportional</button><button class="pill">Equal</button></div>
+<div class="row" style="border-top: 1px solid #F0EFEE; padding-top: 14px"><span style="font-size: 15px">Tip</span><span class="muted" style="font-size: 14px">None on receipt</span></div>
+<div class="chips" role="group" aria-label="Tip"><button class="pill on">None</button><button class="pill">18%</button><button class="pill">20%</button><button class="pill">22%</button><button class="pill">Custom</button></div>
+</div>
+<div class="card" style="padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div class="lbl">From your conversation</div>
+<div class="row"><span style="font-size: 15px">Sanil covers half of Maya's total</span>
+<span style="display: flex; gap: 4px"><button class="ib" aria-label="Edit rule" style="border: 0; width: 36px; height: 36px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></button><button class="ib" aria-label="Delete rule" style="border: 0; width: 36px; height: 36px; color: #57534E"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button></span></div>
+</div>
+</div>
+<div style="padding: 12px 20px 28px; background: #fff; border-top: 1px solid #E7E5E4; display: flex; flex-direction: column; gap: 8px">
+<div class="muted" style="font-size: 13px; text-align: center">Fix 1 item to continue</div>
+<button disabled style="height: 52px; border: 0; border-radius: 14px; background: #E7E5E4; color: #57534E; font: 600 16px Inter, sans-serif">Calculate</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#047857"},"$preview":{"width":390,"height":1480}}'>
+class Component extends DCLogic {
+renderVals() {
+return { accent: this.props.accent ?? '#047857' };
+}
+}
+</script>
+</body>
+</html>
