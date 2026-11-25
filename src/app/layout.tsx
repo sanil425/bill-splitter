@@ -1,11 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "SplitIt",
@@ -14,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#059669",
+  themeColor: "#047857",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -22,8 +20,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col font-sans">
+        <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col">{children}</div>
+      </body>
     </html>
   );
 }

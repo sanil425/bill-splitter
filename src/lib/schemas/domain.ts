@@ -138,7 +138,9 @@ export type Flag = z.infer<typeof FlagSchema>;
 
 /** What the host gave us. Photos become receipts; voice and text feed attribution. */
 export const InputSchema = z.discriminatedUnion("kind", [
-  z.object({ id: IdSchema, kind: z.literal("photo"), receiptId: IdSchema.optional() }),
+  /** receiptId is set once parsed; thumbnail is a small JPEG data URL (the full photo isn't stored). */
+  z.object({ id: IdSchema, kind: z.literal("photo"), receiptId: IdSchema.optional(), thumbnail: z.string().optional() }),
+  /** An empty transcript means it hasn't been transcribed yet. */
   z.object({ id: IdSchema, kind: z.literal("voice"), transcript: z.string() }),
   z.object({ id: IdSchema, kind: z.literal("text"), text: z.string() }),
 ]);

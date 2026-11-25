@@ -34,6 +34,8 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 
 - `src/lib/schemas`, `src/lib/calculator`, `src/lib/validator`, `src/lib/ai`, `src/lib/ratelimit`
 - `src/lib/uploads.ts` (size limits, file type sniffing, audio duration), `src/lib/http.ts` (route helpers)
+- `src/lib/store` (split reducer, localStorage, `newSplit`/`sampleSplit`, in-memory `blobs`), `src/lib/display.ts` (labels for UI)
+- `src/lib/pipeline.ts` (client orchestrator for the AI routes), `src/lib/image.ts` (client photo shrink)
 - `src/components`, `src/app/api`
 - `prompts/`: runtime prompts; `evals/`: AI pipeline test cases
 
@@ -54,6 +56,10 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 - AI routes: `POST /api/attribute` (JSON), `POST /api/parse-receipt` (multipart `image`: JPEG/PNG/WebP, ≤4 MB → domain `Receipt`, 422 `NO_ITEMS` if empty), `POST /api/transcribe` (multipart `audio`: webm/mp4/m4a/mp3, ≤4 MB and ≤3 min → `{ text }`). File types come from the bytes, never the declared type. Order: validate input (400/413) → `checkRateLimit()` (429/503) → AI call (502 with `code` only, 500 for anything else). Errors are `{ error: { code, message } }`, never internals. Uploads stay under Vercel's 4.5 MB body limit, so the client must shrink photos.
 - Rate limits (`src/lib/ratelimit`): per-IP sliding window + global daily cap (UTC day), env `RATE_LIMIT_IP_REQUESTS` / `RATE_LIMIT_IP_WINDOW` / `RATE_LIMIT_DAILY_CAP` (defaults 20 per `10 m`, 500/day). Fails closed: missing Redis env, Redis errors or a >3 s check → 503 `RATE_LIMIT_UNAVAILABLE` (library timeout is off because it fails open). Tests mock `getLimiters` in `limiters.ts` with `fakeLimiters()`.
 - Runtime prompts are versioned files in `prompts/` (current: `attribution.v2.md`, `receipt.v1.md`), read via `loadPrompt()`; add new ones to `outputFileTracingIncludes` in `next.config.ts`. Change a prompt's behaviour → new version file, and rerun its eval.
+- UI: tokens in `@theme` in `globals.css` (`bg-bg`, `text-ink`, `text-muted`, `border-line`, `bg-primary`, `bg-fix-bg`, `rounded-card`…); reuse `src/components/ui.tsx` (no class merging, so don't pass a class that conflicts with a component's own). Touch targets ≥ 44px.
+- State: one split per `/split/[id]/*` route, held by `SplitProvider` (context + `useReducer(splitReducer)`), autosaved to localStorage on every change. `splitReducer` re-runs `mergeFlags(validate())` after every action. Splits are client-only (rendered after mount); `/s/[id]` is a static sample until phase 10. Cache Components is on: pages keep their state across navigation, so read localStorage during render, not once in `useState`, and wrap `useParams` users in `<Suspense>`.
+- Pipeline (`runPipeline`): photos + pending voice in parallel, then attribution. Progress is saved on the split (`photo.receiptId`, `voice.transcript`; empty = pending), so re-running resumes and never re-parses a photo. Re-process replaces people/assignments/rules/AI flags, keeps receipts. No notes → host gets everything, no AI call. Full photos/audio live only in memory (`blobs`); inputs keep a small `thumbnail`. Photos are shrunk on the phone to JPEG ≤2000px, ≤4 MB. Max 5 photos. Dev sample: `/?sample=1` then New split.
+- AI flags with an `itemId` resolve themselves when that item goes from unassigned to assigned (not on `replace`), and the banner shows them under the item's `ITEM_UNASSIGNED` flag instead of as their own row.
 - Live evals (`npm run eval:<name>`) call the real API and cost money; they're never part of `npm test`.
 - Mismatch tolerance is 2 cents (`TOLERANCE_CENTS`); low confidence is < 0.8. The printed tip is ignored when `tipOverride` is set (same as the calculator).
 
@@ -66,4 +72,4 @@ Multiple receipts, voice + text, no-receipt mode, USD/English only, no accounts.
 
 ## Build plan (one prompt per phase)
 
-1 setup · 2 schemas · 3 calculator · 4 validator · 5 attribution API · 6 receipt API · 7 capture UI · 8 review UI · 9 breakdown UI · 10 voice · 11 share/send · 12 hardening · 13 evals · 14 polish
+1 setup · 2 schemas · 3 calculator · 4 validator · 5 attribution API · 6 receipt API · 7 UI + screens · 8 capture + pipeline + voice · 9 deploy · 10 share/send + history · 11 real-receipt evals · 12 polish
